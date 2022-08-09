@@ -32,18 +32,33 @@ class Dashboard extends Component {
     super(props);
     this.state = {
       loading: false,
+      focused: null,
     };
+
+    this.selectPanel = this.selectPanel.bind(this);
+  }
+
+  selectPanel(id) {
+    this.setState((prevState) => ({
+      focused: prevState.focused ? null : id,
+    }));
   }
 
   render() {
-    const dashboardClasses = classnames("dashboard");
+    const dashboardClasses = classnames("dashboard", {
+      "dashboard--focused": this.state.focused,
+    });
 
     if (this.state.loading) {
       return <Loading />;
     }
 
-    const panelData = data.map((d) => {
-      return <Panel key={d.id} {...d} />;
+    const panelData = (
+      this.state.focused
+        ? data.filter((d) => this.state.focused === d.id)
+        : data
+    ).map((d) => {
+      return <Panel key={d.id} {...d} onSelect={this.selectPanel} />;
     });
 
     return <main className={dashboardClasses}>{panelData}</main>;
